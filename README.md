@@ -3,6 +3,7 @@ A simple circuit breaker implementation for .NET.
 + Forked and updated from Tatham Oddie's Reliability Patterns solution on GitHub: https://github.com/tathamoddie/reliability-patterns
 
 Taking advantage of the library is as simple as wrapping your outgoing service call with circuitBreaker.Execute:
+
 ```cs
 // Note: you'll need to keep this instance around
 var breaker = new CircuitBreaker();
