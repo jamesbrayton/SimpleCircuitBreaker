@@ -14,7 +14,7 @@ $PSScriptFilePath = (Get-Item $MyInvocation.MyCommand.Path).FullName
 $SolutionRoot = Split-Path -Path $PSScriptFilePath -Parent
 
 # Build the NuGet package
-$ProjectPath = Join-Path -Path $SolutionRoot -ChildPath "ReliabilityPatterns\ReliabilityPatterns.csproj"
+$ProjectPath = Join-Path -Path $SolutionRoot -ChildPath "SimpleCircuitBreaker\SimpleCircuitBreaker.csproj"
 & nuget.exe pack $ProjectPath -Prop Configuration=Release -OutputDirectory $SolutionRoot
 if (-not $?)
 {
@@ -24,7 +24,7 @@ if (-not $?)
 # Upload the NuGet package
 if ($Push)
 {
-	$NuPkgPath = Join-Path -Path $SolutionRoot -ChildPath "ReliabilityPatterns.$ReleaseVersionNumber.nupkg"
+	$NuPkgPath = Join-Path -Path $SolutionRoot -ChildPath "SimpleCircuitBreaker.$ReleaseVersionNumber.nupkg"
 	& nuget.exe push $NuPkgPath
 	if (-not $?)
 	{
