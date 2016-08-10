@@ -14,6 +14,6 @@ breaker.Execute(() => client.SendEmail(message));
 
 You can also take advantage of built-in retry logic:
 
-``cs
+```cs
 breaker.ExecuteWithRetries(() => client.SendEmail(message), 10, TimeSpan.FromSeconds(20));
 ```
