@@ -27,6 +27,16 @@ namespace SimpleCircuitBreaker
         event EventHandler ServiceLevelChanged;
 
         /// <summary>
+        ///     Gets the most recent time it took to make a call through the circuit breaker.
+        /// </summary>
+        TimeSpan Latency { get; }
+
+        /// <summary>
+        ///     Gets the count of total calls through the circuit breaker.
+        /// </summary>
+        uint TotalCallCount { get; }
+        
+        /// <summary>
         ///     Gets or sets the number of failures allowed before the circuit trips.
         /// </summary>
         uint Threshold { get; set; }

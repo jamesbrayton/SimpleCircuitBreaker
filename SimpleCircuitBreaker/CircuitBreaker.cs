@@ -10,6 +10,7 @@
 namespace SimpleCircuitBreaker
 {
     using System;
+    using System.Diagnostics;
     using System.Threading;
     using System.Timers;
 
@@ -26,12 +27,7 @@ namespace SimpleCircuitBreaker
         ///     The reset timer.
         /// </summary>
         private readonly Timer resetTimer;
-
-        /// <summary>
-        ///     The latency timer.
-        /// </summary>
-        private readonly Timer latencyTimer;
-
+        
         /// <summary>
         ///     The failure count.
         /// </summary>
@@ -41,16 +37,6 @@ namespace SimpleCircuitBreaker
         ///     The error threshold before the circuit trips.
         /// </summary>
         private uint threshold;
-
-        /// <summary>
-        ///     The most recent time it took to make a call through the circuit breaker.
-        /// </summary>
-        private TimeSpan latency;
-
-        /// <summary>
-        ///     The average amount of time it takes to make a call through the circuit breaker.
-        /// </summary>
-        private TimeSpan averageLatency;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="CircuitBreaker"/> class.
@@ -74,6 +60,8 @@ namespace SimpleCircuitBreaker
             this.threshold = threshold;
             this.failureCount = 0;
             this.State = CircuitBreakerState.Closed;
+            this.Latency = TimeSpan.Zero;
+            this.TotalCallCount = 0;
 
             this.resetTimer = new Timer(resetTimeout.TotalMilliseconds);
             this.resetTimer.Elapsed += this.ResetTimerElapsed;
@@ -104,6 +92,16 @@ namespace SimpleCircuitBreaker
             }
         }
 
+        /// <summary>
+        ///     The most recent time it took to make a call through the circuit breaker.
+        /// </summary>
+        public TimeSpan Latency { get; private set; }
+        
+        /// <summary>
+        ///     The count of total calls through the circuit breaker.
+        /// </summary>
+        public uint TotalCallCount { get; private set; }
+        
         /// <summary>
         ///     Gets or sets the time before the circuit attempts to close after being tripped.
         /// </summary>
@@ -154,8 +152,12 @@ namespace SimpleCircuitBreaker
         public TResult Execute<TResult>(Func<TResult> operation)
         {
             // Start the latency timer.
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
 
-
+            // Update the total call count.
+            ++this.TotalCallCount;
+            
             // Check if the circuit is already open.
             if (this.State == CircuitBreakerState.Open)
             {
@@ -207,6 +209,10 @@ namespace SimpleCircuitBreaker
 
                 this.OnServiceLevelChanged(new EventArgs());
             }
+            
+            // Update the latency for this call.
+            stopWatch.Stop();
+            this.Latency = stopWatch.Elapsed;
 
             return result;
         }

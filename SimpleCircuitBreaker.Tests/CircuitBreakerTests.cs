@@ -10,6 +10,9 @@
 namespace SimpleCircuitBreaker.Tests
 {
     using System;
+    using System.Threading;
+
+    using Moq;
 
     using NUnit.Framework;
 
@@ -95,6 +98,54 @@ namespace SimpleCircuitBreaker.Tests
             }
 
             return circuitBreaker.ServiceLevel;
+        }
+
+        /// <summary>
+        ///     Tests that the call count of the circuit breaker is incremented when a call through
+        ///     the circuit breaker is made.
+        /// </summary>
+        [Test]
+        public void TestCircuitBreakerIncrementsTotalCallCount()
+        {
+            // Setup a circuit breaker.
+            var circuitBreaker = new CircuitBreaker();
+
+            // Setup a mock object to call in the circuit breaker.
+            var mockOperation = new Mock<ITestAction>();
+            mockOperation.Setup(action => action.ToString());
+
+            // The initial call count of the circuit breaker.
+            var initCallCount = circuitBreaker.TotalCallCount;
+
+            // Execute the call through the circuit breaker.
+            circuitBreaker.Execute(() => mockOperation.Object.ToString());
+
+            // The final call count through the circuit breaker.
+            var finalCallCount = circuitBreaker.TotalCallCount;
+
+            // Make sure that the call count has incremented by 1.
+            Assert.AreEqual(initCallCount + 1, finalCallCount);
+        }
+
+        /// <summary>
+        ///     Tests that the latency of the call through the circuit breaker is recorded.
+        /// </summary>
+        [Test]
+        public void TestCircuitBreakerRecordsCallLatency()
+        {
+            // Setup a circuit breaker.
+            var circuitBreaker = new CircuitBreaker();
+
+            // Setup a mock object to call in the circuit breaker.  We want to make sure it takes
+            // 1 second so that we can see the latency.
+            var mockOperation = new Mock<ITestAction>();
+            mockOperation.Setup(action => action.ToString()).Callback(() => Thread.Sleep(1000));
+
+            // Execute the call through the circuit breaker.
+            circuitBreaker.Execute(() => mockOperation.Object.ToString());
+            
+            // Make sure that the call took about 1 second.7
+            Assert.AreEqual(TimeSpan.FromSeconds(1).Seconds, circuitBreaker.Latency.Seconds);
         }
     }
 }
