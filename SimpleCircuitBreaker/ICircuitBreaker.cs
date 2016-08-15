@@ -34,12 +34,12 @@ namespace SimpleCircuitBreaker
         /// <summary>
         ///     Gets the count of total calls through the circuit breaker.
         /// </summary>
-        uint TotalCallCount { get; }
+        int TotalCallCount { get; }
         
         /// <summary>
         ///     Gets or sets the number of failures allowed before the circuit trips.
         /// </summary>
-        uint Threshold { get; set; }
+        int Threshold { get; set; }
 
         /// <summary>
         ///     Gets or sets the time before the circuit attempts to close after being tripped.

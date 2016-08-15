@@ -41,7 +41,7 @@ namespace SimpleCircuitBreaker
         ///     The <see cref="TResult"/>.
         /// </returns>
         public static TResult ExecuteWithRetries<TResult>(
-            this CircuitBreaker circuitBreaker,
+            this ICircuitBreaker circuitBreaker,
             Func<TResult> operation,
             RetryOptions retryOptions = null)
         {
@@ -84,7 +84,7 @@ namespace SimpleCircuitBreaker
         ///     The retry options.
         /// </param>
         public static void ExecuteWithRetries(
-            this CircuitBreaker circuitBreaker, Action operation, RetryOptions retryOptions = null)
+            this ICircuitBreaker circuitBreaker, Action operation, RetryOptions retryOptions = null)
         {
             retryOptions = retryOptions ?? new RetryOptions();
 

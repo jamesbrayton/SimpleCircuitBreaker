@@ -31,18 +31,18 @@ namespace SimpleCircuitBreaker
         /// <summary>
         ///     The failure count.
         /// </summary>
-        private int failureCount;
+        private int failureCount = 0;
 
         /// <summary>
         ///     The error threshold before the circuit trips.
         /// </summary>
-        private uint threshold;
+        private int threshold = 0;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="CircuitBreaker"/> class.
         /// </summary>
         public CircuitBreaker()
-            : this(5, TimeSpan.FromSeconds(60))
+            : this(5, 60)
         {
         }
 
@@ -55,7 +55,7 @@ namespace SimpleCircuitBreaker
         /// <param name="resetTimeout">
         ///     The reset timeout.
         /// </param>
-        public CircuitBreaker(uint threshold, TimeSpan resetTimeout)
+        public CircuitBreaker(int threshold, int resetTimeout)
         {
             this.threshold = threshold;
             this.failureCount = 0;
@@ -63,7 +63,7 @@ namespace SimpleCircuitBreaker
             this.Latency = TimeSpan.Zero;
             this.TotalCallCount = 0;
 
-            this.resetTimer = new Timer(resetTimeout.TotalMilliseconds);
+            this.resetTimer = new Timer(TimeSpan.FromSeconds(resetTimeout).TotalMilliseconds);
             this.resetTimer.Elapsed += this.ResetTimerElapsed;
         }
 
@@ -74,7 +74,7 @@ namespace SimpleCircuitBreaker
         /// <summary>
         ///     Gets or sets the number of failures allowed before the circuit trips.
         /// </summary>
-        public uint Threshold
+        public int Threshold
         {
             get
             {
@@ -100,7 +100,7 @@ namespace SimpleCircuitBreaker
         /// <summary>
         ///     The count of total calls through the circuit breaker.
         /// </summary>
-        public uint TotalCallCount { get; private set; }
+        public int TotalCallCount { get; private set; }
         
         /// <summary>
         ///     Gets or sets the time before the circuit attempts to close after being tripped.
